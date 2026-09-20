@@ -47,14 +47,5 @@ def insert_data():
     conn.commit()
     conn.close()
 
-def queries():
-    conn = get_connection()
-    cur = conn.cursor()
-
-    
-    pass
-
-
-
 create_table()
 insert_data()
