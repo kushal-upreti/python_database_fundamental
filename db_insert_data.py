@@ -11,9 +11,6 @@ def create_table():
             Create table if not exists Record(
             id integer primary key, name text, age integer, city text, score real
             );
-            Create table if not exists FlagRecord(
-            id integer, name text, age integer, city text, score real
-            );
         """)
 
         conn.commit()
