@@ -21,11 +21,11 @@ def people_above_given_score():
     conn = get_connection()
     cur = conn.cursor()
 
-    score = float(input("Enter the city name: "))
+    score = float(input("Enter the score: "))
 
     result =  cur.execute(
         """
-        Seleet *from Record where score > ?
+        Select *from Record where score > ?
         """,
         (score,)
     ).fetchall()
