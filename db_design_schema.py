@@ -32,119 +32,149 @@ time_data = [
     (6, "2026-09-21")
 ]
 
-exam_data= [
+exam_data = [
+    # person_id, subject_code, time_id, score
+
+    # Person 101
     (101, 101, 1, 85),
     (101, 102, 2, 78),
     (101, 103, 3, 92),
+
+    # Person 102
     (102, 101, 1, 74),
-    (102, 104, 3, 88),
+    (102, 104, 4, 88),
     (102, 105, 5, 81),
     (102, 106, 6, 90),
+
+    # Person 103
     (103, 102, 2, 69),
     (103, 103, 3, 84),
-    (103, 106, 5, 76),
+    (103, 106, 6, 76),
+
+    # Person 104
     (104, 101, 1, 91),
-    (104, 103, 2, 87),
+    (104, 103, 3, 87),
     (104, 104, 4, 79),
-    (105, 102, 1, 73),
-    (105, 104, 3, 95),
+
+    # Person 105
+    (105, 102, 2, 73),
+    (105, 104, 4, 95),
     (105, 105, 5, 82),
     (105, 106, 6, 89),
-    (106, 101, 2, 68),
-    (106, 102, 3, 77),
-    (106, 105, 4, 86),
-    (107, 103, 1, 93),
-    (107, 104, 3, 71),
-    (107, 106, 6, 88),
-    (108, 101, 2, 80),
-    (108, 102, 4, 75),
-    (108, 103, 5, 91),
-    (109, 104, 1, 83),
-    (109, 105, 3, 79),
-    (109, 106, 5, 94),
-    (109, 101, 6, 87),
-    (110, 102, 1, 72),
-    (110, 103, 2, 89),
-    (110, 105, 4, 81)
-]
 
+    # Person 106
+    (106, 101, 1, 68),
+    (106, 102, 2, 77),
+    (106, 105, 5, 86),
+
+    # Person 107
+    (107, 103, 3, 93),
+    (107, 104, 4, 71),
+    (107, 106, 6, 88),
+
+    # Person 108
+    (108, 101, 1, 80),
+    (108, 102, 2, 75),
+    (108, 103, 3, 91),
+
+    # Person 109
+    (109, 104, 4, 83),
+    (109, 105, 5, 79),
+    (109, 106, 6, 94),
+    (109, 101, 1, 87),
+
+    # Person 110
+    (110, 102, 2, 72),
+    (110, 103, 3, 89),
+    (110, 105, 5, 81),
+]
 
 def create_table():
 
     conn= get_connection()
     cur= conn.cursor()
-    try:
-        result = cur.executescript(
-            """
-            CREATE TABLE Person(person_id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+    
+    cur.executescript(
+        """
+        drop table if exists Person;
+        drop table if exists Exam;
+        drop table if exists Time;
+        drop table if exists Subjects;
 
-            CREATE TABLE Exam (
-            person_id INTEGER,
-            subject_code INTEGER,
-            time_id INTEGER,
-            score REAL,
 
-            PRIMARY KEY (person_id, subject_code, time_id),
 
-            FOREIGN KEY (person_id) REFERENCES Person(person_id),
-            FOREIGN KEY (subject_code) REFERENCES Subjects(subject_code),
-            FOREIGN KEY (time_id) REFERENCES Time(time_id)
-            );
+        CREATE TABLE   Person(person_id INTEGER PRIMARY KEY, name TEXT NOT NULL);
 
-            CREATE TABLE Subjects(
-            subject_code INTEGER PRIMARY KEY, 
-            subject_name text UNIQUE);
+        CREATE TABLE   Exam (
+        person_id INTEGER,
+        subject_code INTEGER,
+        time_id INTEGER,
+        score REAL,
+        PRIMARY KEY (person_id, subject_code, time_id),
+        FOREIGN KEY (person_id) REFERENCES Person(person_id),
+        FOREIGN KEY (subject_code) REFERENCES Subjects(subject_code),
+        FOREIGN KEY (time_id) REFERENCES Time(time_id)
+        );
 
-            CREATE TABLE Time(time_id integer primary KEY, exam_date date);
+        CREATE TABLE   Subjects(
+        subject_code INTEGER PRIMARY KEY, 
+        subject_name text UNIQUE);
 
-            """
-        )
+        CREATE TABLE   Time(time_id integer primary KEY, exam_date date);
+        
+        Create Index   idx_exam_time
+        on Exam(time_id);
 
-        conn.commit()
-        conn.close()
-    except sqlite3.OperationalError:
-        print('table already exist')
+        create index   idx_subject_code
+        on Exam(subject_code);
+        """
+    )
+    conn.commit()
+    conn.close()
+ 
 
         
 def insert_data():
 
-    try:
-        conn= get_connection()
-        cur= conn.cursor()
 
-        cur.executemany(
-            """
-            Insert into Person(person_id, name)
-            values (?, ?)
-            """,
-            person_data
-        )
-        cur.executemany(
-            """
-            Insert into Subjects(subject_code, subject_name)
-            values (?, ?)
-            """,
-            subjects_data
-        )
-        cur.executemany(
-            """
-            Insert into Time(time_id, exam_date)
-            values (?, ?)
-            """,
-            time_data
-        )
-        cur.executemany(
-            """
-            Insert into Exam(person_id, subject_code, time_id, score)
-            values (?, ?, ?, ?)
-            """,
-            exam_data
-        )
+    conn= get_connection()
+    cur= conn.cursor()
 
-        conn.commit()
-        conn.close()
-    except sqlite3.IntegrityError:
-        print('data already inserted with this id')
+
+    cur.executemany(
+        """
+        Insert into Person(person_id, name)
+        values (?, ?)
+        """,
+        person_data
+    )
+
+    cur.executemany(
+        """
+        Insert into Subjects(subject_code, subject_name)
+        values (?, ?)
+        """,
+        subjects_data
+    )
+
+    cur.executemany(
+        """
+        Insert into Time(time_id, exam_date)
+        values (?, ?)
+        """,
+        time_data
+    )
+
+    cur.executemany(
+        """
+        Insert into Exam(person_id, subject_code, time_id, score)
+        values (?, ?, ?, ?)
+        """,
+        exam_data
+    )
+
+    conn.commit()
+    conn.close()
 
 
 

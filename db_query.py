@@ -30,6 +30,8 @@ def people_above_given_score():
         (score,)
     ).fetchall()
 
+    return result
+
 
 def top_5_highest_score():
     conn = get_connection()

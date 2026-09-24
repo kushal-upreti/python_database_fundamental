@@ -15,8 +15,8 @@ def create_table():
 
         conn.commit()
         conn.close()
-    except sqlite3.C as e:
-        print(f"database erro: {e}")
+    except sqlite3.OperationalError as e:
+        print(f"database error: {e}")
 
 
 def insert_data():
